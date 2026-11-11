@@ -1,0 +1,40 @@
+---
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"   # weekly, catches breaking plugin updates
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint Dockerfile
+        run: docker run --rm -i hadolint/hadolint < Dockerfile
+      - name: Lint shell scripts
+        run: shellcheck scripts/*.sh
+      - name: Lint YAML
+        run: |
+          pip install yamllint
+          yamllint -d '{extends: default, rules: {line-length: {max: 160}, document-start: disable, truthy: {check-keys: false}}}' casc compose.yaml .github
+      - name: Compile shared library
+        run: docker run --rm -v "$PWD:/w" -w /w groovy:4.0-jdk17 groovyc -d /tmp/classes vars/*.groovy
+
+  boot:
+    needs: lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/init-secrets.sh
+      - run: docker compose up -d --build
+      - run: ./scripts/smoke-test.sh
+      - name: Jenkins logs on failure
+        if: failure()
+        run: docker compose logs --tail 200
