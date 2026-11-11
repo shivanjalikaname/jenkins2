@@ -1,0 +1,21 @@
+services:
+  jenkins:
+    build: .
+    image: jenkins-casc:local
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      JENKINS_ADMIN_ID: admin
+      JENKINS_URL: http://localhost:8080/
+    secrets:
+      - JENKINS_ADMIN_PASSWORD
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    restart: unless-stopped
+
+secrets:
+  JENKINS_ADMIN_PASSWORD:
+    file: ./secrets/jenkins_admin_password
+
+volumes:
+  jenkins_home:
