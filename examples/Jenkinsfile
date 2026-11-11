@@ -1,0 +1,6 @@
+@Library('pipeline-lib') _
+
+standardPipeline(
+    buildCmd: 'echo "build step goes here"',
+    testCmd: 'echo "test step goes here"',
+)
