@@ -22,9 +22,7 @@ jenkins:
             permissions:
               - "Overall/Read"
               - "Job/Read"
-  crumbIssuer:
-    standard:
-      excludeClientIPFromCrumb: false
+  crumbIssuer: "standard"   # CSRF protection
 
 security:
   globalJobDslSecurityConfiguration:
