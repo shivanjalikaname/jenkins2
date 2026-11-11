@@ -10,4 +10,4 @@ RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
 COPY --chown=jenkins:jenkins casc/ /usr/share/jenkins/ref/casc/
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=180s --retries=3 \
-  CMD curl -fsS http://localhost:8080/login > /dev/null || exit 1
+  CMD ["curl", "-fsS", "-o", "/dev/null", "http://localhost:8080/login"]
